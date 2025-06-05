@@ -133,3 +133,105 @@ See the full license text at: https://creativecommons.org/licenses/by-sa/4.0/
 ## ⚠️ Disclaimer
 
 This tool is part of the larger Sanctum toolset and is designed for use with Letta agents. Use responsibly and in accordance with Telegram's terms of service.
+
+## Project Structure
+```
+project_root/
+  ├── botfather_relay/           # FastAPI relay and Telethon client
+  ├── botfather.py               # Tool function and CLI
+  ├── tests/                     # All test scripts
+  ├── README.md                  # This file
+  ├── requirements.txt           # Python dependencies
+  ├── LICENSE                    # CC-BY-SA 4.0 License
+  └── ...
+```
+
+## Setup Instructions
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Configure the relay:**
+   - Set your Telegram API ID, hash, and phone number in the environment or `.env` file as described in `botfather_relay/config.py`.
+3. **Run the relay:**
+   ```bash
+   python -m botfather_relay.main
+   # or use screen/tmux as recommended
+   ```
+
+## Usage Guide
+### 1. Python Function
+```python
+from botfather import provision_botfather_message
+
+replies = provision_botfather_message("/newbot")
+for reply in replies:
+    print(reply)
+```
+
+### 2. CLI Tool
+```bash
+python botfather.py "/newbot"
+```
+
+#### CLI Output Example
+```
+BotFather reply 1
+BotFather reply 2
+BotFather reply 3
+```
+
+### 3. Expected Response Format
+The relay returns JSON like:
+```json
+{
+  "messages": [
+    "BotFather reply 1",
+    "BotFather reply 2",
+    "BotFather reply 3"
+  ]
+}
+```
+On error:
+```json
+{
+  "error": "Description of the error"
+}
+```
+
+## Integration Instructions (for Monday's Framework)
+Add this snippet to your integration docs:
+```python
+from botfather import provision_botfather_message
+
+try:
+    replies = provision_botfather_message("/setinline")
+    # Process replies as needed
+except Exception as e:
+    # Handle error (e.g., relay not running, network issue)
+    print(f"BotFather error: {e}")
+```
+
+## Running Tests
+To run all tests:
+```bash
+pytest
+```
+Or to run only the tool tests:
+```bash
+pytest tests/test_botfather.py -v
+```
+
+## Troubleshooting
+- **requests not installed:** Run `pip install requests`.
+- **Relay not running:** Start the relay server before using the tool or CLI.
+- **Connection refused:** Ensure the relay is listening on `localhost:57431`.
+- **API credentials invalid:** Double-check your Telegram API ID, hash, and phone number.
+- **Deprecation warnings:** Some warnings may appear due to upstream library changes; they do not affect core functionality.
+
+## License
+This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International License (CC-BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
+
+## Acknowledgments
+- Built for Monday (Sanctum agent) integration
+- Uses [Telethon](https://github.com/LonamiWebs/Telethon), [FastAPI](https://fastapi.tiangolo.com/), and [requests](https://docs.python-requests.org/)
