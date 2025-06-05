@@ -1,7 +1,25 @@
-fastapi==0.109.2
-uvicorn==0.27.1
-telethon==1.34.0
-python-dotenv==1.0.1
-pydantic==1.10.13  # Using an older version that doesn't require Rust
-python-multipart==0.0.9
-cryptg==0.4.0  # For faster Telethon operations 
+# Core dependencies
+fastapi>=0.110.0
+uvicorn>=0.27.1
+telethon>=1.34.0
+python-dotenv>=1.0.1
+pydantic>=2.6.3
+python-multipart>=0.0.9
+
+# Security
+python-jose[cryptography]>=3.3.0  # For JWT token handling
+passlib[bcrypt]>=1.7.4  # For password hashing if needed
+
+# Utilities
+tenacity>=8.2.3  # For retrying operations
+structlog>=24.1.0  # For structured logging
+python-json-logger>=2.0.7  # For JSON formatted logs
+
+# Development dependencies
+pytest>=8.0.0
+pytest-asyncio>=0.23.5
+pytest-cov>=4.1.0
+black>=24.1.1
+isort>=5.13.2
+flake8>=7.0.0
+mypy>=1.8.0 
