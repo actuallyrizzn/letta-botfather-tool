@@ -3,18 +3,18 @@
 ## 🎯 Core Requirements
 
 ### Python Function
-- [ ] Implement `provision_botfather_message(message: str) -> List[str]`
-- [ ] Use only Python standard library and `requests` (no extra dependencies)
-- [ ] Function sends POST request to `http://localhost:57431/send_message`
-- [ ] Function returns a list of BotFather replies
-- [ ] Add clear docstrings and comments
-- [ ] Handle connection errors, timeouts, and invalid responses
+- [x] Implement `provision_botfather_message(message: str) -> List[str]`
+- [x] Use only Python standard library and `requests` (no extra dependencies)
+- [x] Function sends POST request to `http://localhost:57431/send_message`
+- [x] Function returns a list of BotFather replies
+- [x] Add clear docstrings and comments
+- [x] Handle connection errors, timeouts, and invalid responses
 
 ### CLI Interface
-- [ ] Implement CLI entry point using `argparse`
-- [ ] Allow usage: `python botfather.py "/newbot"`
-- [ ] Print BotFather responses in a human-readable way
-- [ ] Add help and usage messages
+- [x] Implement CLI entry point using `argparse`
+- [x] Allow usage: `python botfather.py "/newbot"`
+- [x] Print BotFather responses in a human-readable way
+- [x] Add help and usage messages
 
 ### Documentation
 - [ ] Add usage examples for both function and CLI
@@ -22,10 +22,10 @@
 - [ ] Provide integration instructions for Monday's framework
 
 ### Testing
-- [ ] Write minimal test script for typical use and error cases
-- [ ] Test function with valid and invalid messages
-- [ ] Test CLI with various arguments
-- [ ] Ensure error handling is robust
+- [x] Write minimal test script for typical use and error cases
+- [x] Test function with valid and invalid messages
+- [x] Test CLI with various arguments
+- [x] Ensure error handling is robust
 
 ## ⚠️ Negative Prompts (What NOT to Do)
 
