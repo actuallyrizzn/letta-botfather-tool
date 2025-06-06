@@ -41,4 +41,13 @@ logs/
 
 # Local development
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Ignore authentication code file
+auth_code.txt
+
+# Ignore BotFather session files
+botfather_session.session
+botfather_session.session-journal 
+botfather_session.session
+botfather_session.session
