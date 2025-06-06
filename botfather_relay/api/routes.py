@@ -94,9 +94,21 @@ async def send_message(
         
         if not replies:
             logging.warning("No replies received from BotFather")
-            return SendMessageResponse(messages=[])
+            return SendMessageResponse(messages=[], buttons=[])
         
-        return SendMessageResponse(messages=[reply['text'] for reply in replies])
+        # Collect all unique button texts from replies
+        all_buttons = []
+        for reply in replies:
+            if 'buttons' in reply:
+                all_buttons.extend(reply['buttons'])
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_buttons = [x for x in all_buttons if not (x in seen or seen.add(x))]
+
+        return SendMessageResponse(
+            messages=[reply['text'] for reply in replies],
+            buttons=unique_buttons
+        )
         
     except ValueError as e:
         logging.error(f"Validation error: {e}")

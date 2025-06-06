@@ -122,11 +122,21 @@ class BotFatherSession:
                 limit=limit,
                 min_id=self._last_message_id
             ):
-                replies.append({
+                reply = {
                     'id': message.id,
                     'text': message.text,
-                    'date': message.date.isoformat()
-                })
+                    'date': message.date.isoformat(),
+                }
+                # Extract button texts from reply_markup if present
+                buttons = []
+                if message.reply_markup and hasattr(message.reply_markup, 'rows'):
+                    for row in message.reply_markup.rows:
+                        for button in row.buttons:
+                            if hasattr(button, 'text'):
+                                buttons.append(button.text)
+                if buttons:
+                    reply['buttons'] = buttons
+                replies.append(reply)
             return replies
         except Exception as e:
             logging.error(f'Error retrieving replies: {e}')
