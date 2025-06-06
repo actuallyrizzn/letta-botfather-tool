@@ -1,14 +1,18 @@
+# Set RELAY_HOST and RELAY_PORT directly here.
+# For Docker (containerized Letta, relay on host or another container):
+# RELAY_HOST = 'host.docker.internal'  # or the container name if using Docker Compose networking
+# RELAY_PORT = '57431'
+#
+# For non-Docker (all running on the same host):
+RELAY_HOST = 'localhost'
+RELAY_PORT = '57431'
+
 import argparse
 import requests
 import json
-import os
 from typing import List
 
-# Get relay configuration from environment variables
-RELAY_HOST = os.getenv('RELAY_HOST', 'localhost')
-RELAY_PORT = os.getenv('RELAY_PORT', '57431')
-
-def provision_botfather_message(message: str) -> List[str]:
+def botfather(message: str) -> List[str]:
     """
     Sends a message to BotFather via the relay API and returns the list of replies.
 
@@ -22,9 +26,6 @@ def provision_botfather_message(message: str) -> List[str]:
         requests.RequestException: If there is an error connecting to the relay.
         ValueError: If the response is invalid or an error is returned.
     """
-    # Get relay configuration from environment variables
-    RELAY_HOST = os.getenv('RELAY_HOST', 'localhost')
-    RELAY_PORT = os.getenv('RELAY_PORT', '57431')
     url = f"http://{RELAY_HOST}:{RELAY_PORT}/send_message"
     payload = {"message": message}
     try:
@@ -46,7 +47,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        replies = provision_botfather_message(args.message)
+        replies = botfather(args.message)
         print("BotFather replies:")
         for i, reply in enumerate(replies, 1):
             print(f"{i}. {reply}")
