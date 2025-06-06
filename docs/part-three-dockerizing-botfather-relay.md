@@ -43,12 +43,51 @@ docker build -t botfather-relay:latest .
 
 ---
 
-## Step 3: Run the Container
+## Step 3: Run the Container (Recommended: Use .env File)
 
-Run the relay API in a detached container, exposing the correct port and passing required environment variables:
+The cleanest way to provide environment variables is to use your existing `.env` file. This keeps your configuration in one place and avoids long command lines.
+
+Assuming your `.env` file looks like:
+
+```
+TELEGRAM_API_ID=20654108
+TELEGRAM_API_HASH=123f111cccd9dda3c289f7dfb673a034
+TELEGRAM_PHONE=+16893418448
+TELEGRAM_GROUP_CHAT_ID=-1001234567890
+HOST=0.0.0.0
+PORT=57431
+```
+
+### Foreground (screen/tmux-friendly)
+
+```bash
+docker run \
+  --name botfather-relay \
+  --env-file .env \
+  -p 57431:57431 \
+  botfather-relay:latest
+```
+- This will run the container in the foreground, perfect for use inside a `screen` or `tmux` session.
+- Use `Ctrl+C` to stop the container when running in the foreground.
+
+### Background (detached)
 
 ```bash
 docker run -d \
+  --name botfather-relay \
+  --env-file .env \
+  -p 57431:57431 \
+  botfather-relay:latest
+```
+
+---
+
+## Alternative: Manual Environment Variables
+
+If you prefer, you can still specify environment variables individually (not recommended if you already have a `.env` file):
+
+```bash
+docker run \
   --name botfather-relay \
   -p 57431:57431 \
   -e TELEGRAM_API_ID=your_api_id \
@@ -60,8 +99,21 @@ docker run -d \
   botfather-relay:latest
 ```
 
-- **Do not mount or share the session file with any other container or the host.**
-- The relay will now be accessible at `http://host.docker.internal:57431` from other containers (e.g., Letta) on the same machine.
+---
+
+## Stopping and Removing the Docker Container
+
+To stop the running container (from any shell on the host):
+
+```bash
+docker stop botfather-relay
+```
+
+To remove the container (after stopping it):
+
+```bash
+docker rm botfather-relay
+```
 
 ---
 

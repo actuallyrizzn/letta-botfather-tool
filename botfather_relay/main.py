@@ -28,4 +28,4 @@ async def global_exception_handler(request: Request, exc: Exception):
     return ErrorResponse(error=str(exc))
 
 if __name__ == "__main__":
-    uvicorn.run("botfather_relay.main:app", host=HOST, port=PORT, reload=True) 
+    uvicorn.run("botfather_relay.main:app", host=HOST, port=PORT) 

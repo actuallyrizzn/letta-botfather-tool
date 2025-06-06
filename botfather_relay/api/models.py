@@ -32,6 +32,10 @@ class SendMessageResponse(BaseModel):
         ...,
         description="List of replies received from BotFather"
     )
+    buttons: List[str] = Field(
+        default_factory=list,
+        description="List of button texts from BotFather's reply markup, if any"
+    )
 
     model_config = {
         "json_schema_extra": {
@@ -40,6 +44,9 @@ class SendMessageResponse(BaseModel):
                     "Please choose a name for your bot.",
                     "Please choose a username for your bot.",
                     "Great! Your bot has been created."
+                ],
+                "buttons": [
+                    "@fartknocker_bot"
                 ]
             }
         }
