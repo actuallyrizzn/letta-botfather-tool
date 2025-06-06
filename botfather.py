@@ -1,7 +1,12 @@
 import argparse
 import requests
 import json
+import os
 from typing import List
+
+# Get relay configuration from environment variables
+RELAY_HOST = os.getenv('RELAY_HOST', 'localhost')
+RELAY_PORT = os.getenv('RELAY_PORT', '57431')
 
 def provision_botfather_message(message: str) -> List[str]:
     """
@@ -17,7 +22,10 @@ def provision_botfather_message(message: str) -> List[str]:
         requests.RequestException: If there is an error connecting to the relay.
         ValueError: If the response is invalid or an error is returned.
     """
-    url = "http://localhost:57431/send_message"
+    # Get relay configuration from environment variables
+    RELAY_HOST = os.getenv('RELAY_HOST', 'localhost')
+    RELAY_PORT = os.getenv('RELAY_PORT', '57431')
+    url = f"http://{RELAY_HOST}:{RELAY_PORT}/send_message"
     payload = {"message": message}
     try:
         response = requests.post(url, json=payload)

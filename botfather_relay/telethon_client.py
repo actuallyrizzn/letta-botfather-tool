@@ -11,10 +11,18 @@ import logging
 import asyncio
 from typing import List, Optional
 import time
+import os
+from dotenv import load_dotenv, set_key
 
 SESSION_NAME = 'botfather_session'
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds
+
+# Define the path for caching the auth code
+AUTH_CODE_FILE = 'auth_code.txt'
+
+# Load environment variables from .env
+load_dotenv()
 
 class BotFatherSession:
     def __init__(self):
@@ -30,9 +38,20 @@ class BotFatherSession:
             if not await self.client.is_user_authorized():
                 await self.client.send_code_request(TELEGRAM_PHONE)
                 logging.info('Authentication code sent. Please check your Telegram app.')
-                # Note: In a real implementation, you'd need to handle the code input
-                # For now, we'll assume the session is already authorized
-                self._is_authenticated = True
+                # Check if cached auth code exists in .env
+                cached_code = os.getenv('TELEGRAM_AUTH_CODE')
+                if cached_code:
+                    code = cached_code
+                else:
+                    code = input('Enter the code you received: ')
+                    # Cache the code in .env
+                    set_key('.env', 'TELEGRAM_AUTH_CODE', code)
+                try:
+                    await self.client.sign_in(TELEGRAM_PHONE, code)
+                except SessionPasswordNeededError:
+                    # If 2FA is enabled, prompt for password
+                    password = input('Please enter your 2FA password: ')
+                    await self.client.sign_in(password=password)
             else:
                 self._is_authenticated = True
                 

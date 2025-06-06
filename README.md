@@ -229,6 +229,17 @@ pytest tests/test_botfather.py -v
 - **API credentials invalid:** Double-check your Telegram API ID, hash, and phone number.
 - **Deprecation warnings:** Some warnings may appear due to upstream library changes; they do not affect core functionality.
 
+## ⚠️ Telethon Concurrency & Session Isolation
+
+**Important:** Telethon (the Telegram client library used by this relay) does not support running multiple clients for the same Telegram account on the same machine at the same time—even if they use different session files or scripts. Doing so can cause database locking errors, session corruption, or unpredictable behavior.
+
+**Best Practice:**
+- Only run one Telethon client per Telegram account per machine at a time.
+- If you need to run multiple services for the same account, isolate them by running the relay API in a separate Docker container or on a different machine.
+- For step-by-step Dockerization instructions, see: [`docs/part3-dockerizing-botfather-relay.md`](docs/part3-dockerizing-botfather-relay.md)
+
+This ensures reliable operation and avoids concurrency issues with Telethon session management.
+
 ## License
 This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International License (CC-BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
 
