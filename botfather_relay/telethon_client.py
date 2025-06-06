@@ -24,6 +24,9 @@ AUTH_CODE_FILE = 'auth_code.txt'
 # Load environment variables from .env
 load_dotenv()
 
+# Global lock to serialize all Telethon access (see project-plan-2.md)
+telethon_lock = asyncio.Lock()
+
 class BotFatherSession:
     def __init__(self):
         self.client = TelegramClient(SESSION_NAME, TELEGRAM_API_ID, TELEGRAM_API_HASH)
@@ -79,19 +82,18 @@ class BotFatherSession:
                 # Validate message
                 if not message or len(message.strip()) == 0:
                     raise ValueError("Message cannot be empty")
-                
-                # Send message
-                sent_message = await self.client.send_message(entity, message)
-                self._last_message_id = sent_message.id
-                
-                # Wait briefly to ensure message is processed
-                await asyncio.sleep(0.5)
-                
-                return {
-                    'id': sent_message.id,
-                    'text': sent_message.text,
-                    'date': sent_message.date.isoformat()
-                }
+                # Serialize all Telethon actions (see project-plan-2.md)
+                async with telethon_lock:
+                    # Send message
+                    sent_message = await self.client.send_message(entity, message)
+                    self._last_message_id = sent_message.id
+                    # Wait briefly to ensure message is processed
+                    await asyncio.sleep(0.5)
+                    return {
+                        'id': sent_message.id,
+                        'text': sent_message.text,
+                        'date': sent_message.date.isoformat()
+                    }
                 
             except FloodWaitError as e:
                 wait_time = e.seconds
@@ -117,26 +119,28 @@ class BotFatherSession:
 
         try:
             replies = []
-            async for message in self.client.iter_messages(
-                entity,
-                limit=limit,
-                min_id=self._last_message_id
-            ):
-                reply = {
-                    'id': message.id,
-                    'text': message.text,
-                    'date': message.date.isoformat(),
-                }
-                # Extract button texts from reply_markup if present
-                buttons = []
-                if message.reply_markup and hasattr(message.reply_markup, 'rows'):
-                    for row in message.reply_markup.rows:
-                        for button in row.buttons:
-                            if hasattr(button, 'text'):
-                                buttons.append(button.text)
-                if buttons:
-                    reply['buttons'] = buttons
-                replies.append(reply)
+            # Serialize all Telethon actions (see project-plan-2.md)
+            async with telethon_lock:
+                async for message in self.client.iter_messages(
+                    entity,
+                    limit=limit,
+                    min_id=self._last_message_id
+                ):
+                    reply = {
+                        'id': message.id,
+                        'text': message.text,
+                        'date': message.date.isoformat(),
+                    }
+                    # Extract button texts from reply_markup if present
+                    buttons = []
+                    if message.reply_markup and hasattr(message.reply_markup, 'rows'):
+                        for row in message.reply_markup.rows:
+                            for button in row.buttons:
+                                if hasattr(button, 'text'):
+                                    buttons.append(button.text)
+                    if buttons:
+                        reply['buttons'] = buttons
+                    replies.append(reply)
             return replies
         except Exception as e:
             logging.error(f'Error retrieving replies: {e}')
