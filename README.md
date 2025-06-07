@@ -50,18 +50,113 @@ A robust, modular command-line tool for provisioning and managing Telegram bots 
 
 All actions are performed via the CLI tool. **All commands implicitly target BotFather.**
 
-### Send a message to BotFather
+### Basic Commands
+
+#### Send a message to BotFather
 ```bash
 python botfather_cli.py send-message --msg "/newbot"
 ```
 
-### Get replies from BotFather
+#### Get replies from BotFather
 ```bash
 python botfather_cli.py get-replies --limit 3
 ```
 
-- The tool will prompt for authentication if the session is missing or expired.
-- All output is printed to stdout; errors to stderr.
+#### Click a button in BotFather's message
+```bash
+# Click by button text (case-insensitive, @ prefix optional)
+python botfather_cli.py click-button --button-text "Payments"
+python botfather_cli.py click-button --button-text "@Payments"
+
+# Click by position (0-based indices)
+python botfather_cli.py click-button --row 1 --col 1
+
+# Optional: specify message ID (defaults to last message)
+python botfather_cli.py click-button --msg-id 123 --button-text "Payments"
+```
+
+### Command Reference
+
+#### `send-message`
+Sends a message to BotFather.
+
+Required arguments:
+- `--msg`: The message to send
+
+Example:
+```bash
+python botfather_cli.py send-message --msg "/newbot"
+```
+
+#### `get-replies`
+Gets the last N messages from BotFather.
+
+Optional arguments:
+- `--limit`: Number of messages to retrieve (default: 1)
+
+Example:
+```bash
+python botfather_cli.py get-replies --limit 3
+```
+
+#### `click-button`
+Clicks a button in a BotFather message.
+
+Required arguments (one of):
+- `--button-text`: Text of the button to click (case-insensitive, @ prefix optional)
+- `--row` and `--col`: Position of the button (0-based indices)
+
+Optional arguments:
+- `--msg-id`: ID of the message containing the button (defaults to last message)
+
+Examples:
+```bash
+# Click by text
+python botfather_cli.py click-button --button-text "Payments"
+python botfather_cli.py click-button --button-text "@Payments"
+
+# Click by position
+python botfather_cli.py click-button --row 1 --col 1
+
+# Click in specific message
+python botfather_cli.py click-button --msg-id 123 --button-text "Payments"
+```
+
+### Output Format
+
+All commands return JSON-formatted output:
+
+#### `send-message` output:
+```json
+{
+    "id": 123,
+    "text": "Message text"
+}
+```
+
+#### `get-replies` output:
+```json
+[
+    {
+        "id": 123,
+        "text": "Message text",
+        "buttons": [
+            ["Button 1", "Button 2"],
+            ["Button 3"]
+        ]
+    }
+]
+```
+
+#### `click-button` output:
+```json
+{
+    "id": 123,
+    "button": "Button text or (row, col)",
+    "result": "Result of button click",
+    "status": "success or error"
+}
+```
 
 ## 🗂️ Project Structure
 ```
