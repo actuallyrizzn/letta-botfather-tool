@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.1 (June 2025) — Workspace Cleanup & Flattening
+- Moved `telethon_client.py` and `config.py` from `botfather_relay/` to project root.
+- Deleted all vestigial relay, API, test, and empty directories.
+- Removed all legacy and compiled files, leaving only CLI, Telethon logic, config, docs, and session files in the root.
+- Project structure is now flat and minimal, optimized for CLI-only use.
+
 ## v2.0.0 (June 2025) — CLI-Only Refactor
 - Major refactor: removed all FastAPI, Uvicorn, and web server code.
 - Project is now a single, modular CLI tool using `argparse`.
