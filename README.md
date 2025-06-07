@@ -1,15 +1,14 @@
-# 🛠️ BotFather Relay Tool
+# 🛠️ BotFather CLI Tool
 
-A secure and efficient relay system for provisioning Telegram bots via BotFather. This tool provides a local API that enables Letta agents to interact with BotFather while maintaining security and control.
+A robust, modular command-line tool for provisioning and managing Telegram bots via BotFather. This tool uses Telethon for all Telegram interactions and is designed for one-off, non-concurrent use—no web server, no API, no concurrency bugs.
 
 ## 🚀 Features
 
-- 🔒 Secure local API relay for BotFather interactions
-- 🔄 Automatic session management and reconnection
-- ⚡ Rate limiting and request validation
-- 📝 Comprehensive logging and error handling
-- 🔐 Optional bearer token authentication
-- 🛡️ Input sanitization and validation
+- 📬 Send messages and commands to BotFather from the CLI
+- 🔄 Automatic session management and authentication
+- 📝 Clear, user-friendly CLI output and error handling
+- 🛡️ No concurrency: safe, predictable, and production-ready
+- 🧩 Easily extensible for new actions and MCP integration
 
 ## 📋 Prerequisites
 
@@ -44,72 +43,51 @@ A secure and efficient relay system for provisioning Telegram bots via BotFather
    TELEGRAM_API_ID=your_api_id
    TELEGRAM_API_HASH=your_api_hash
    TELEGRAM_PHONE=your_phone_number
-   API_BEARER_TOKEN=your_optional_bearer_token
-   HOST=127.0.0.1
-   PORT=57431
-   LOG_LEVEL=INFO
+   # Optionally: TELETHON_SESSION_NAME=botfather_session
    ```
 
 ## 🚀 Usage
 
-1. Start the relay server:
-   ```bash
-   python -m botfather_relay.main
-   ```
+All actions are performed via the CLI tool:
 
-2. Send a message to BotFather:
-   ```bash
-   curl -X POST http://localhost:57431/send_message \
-     -H "Content-Type: application/json" \
-     -H "Authorization: Bearer your_token" \
-     -d '{"message": "/newbot"}'
-   ```
+### Send a message to BotFather
+```bash
+python botfather_cli.py send-message --to BotFather --msg "/newbot"
+```
 
-3. Example response:
-   ```json
-   {
-     "messages": [
-       "Please choose a name for your bot.",
-       "Please choose a username for your bot.",
-       "Great! Your bot has been created."
-     ]
-   }
-   ```
+### Get replies from BotFather
+```bash
+python botfather_cli.py get-replies --entity BotFather --limit 3
+```
 
-## 🔒 Security Considerations
+- The tool will prompt for authentication if the session is missing or expired.
+- All output is printed to stdout; errors to stderr.
 
-- The API is bound to localhost (`127.0.0.1`) by default
-- Optional bearer token authentication for additional security
-- Input validation and sanitization
-- Rate limiting to prevent abuse
-- No sensitive data logging
-- Secure session management
+## 🗂️ Project Structure
+```
+project_root/
+  ├── botfather_cli.py           # Main CLI entry point
+  ├── telethon_client.py         # Telethon logic abstraction
+  ├── config.py                  # Telegram API credentials/config
+  ├── README.md                  # This file
+  ├── CHANGELOG.md               # Project history
+  ├── requirements.txt           # Python dependencies
+  ├── LICENSE                    # License
+  ├── docs/                      # Project plans and notes
+  └── ... (session files, etc.)
+```
 
-## 📝 Logging
+## 📝 Session Handling
+- The tool stores your Telegram session in the project root (or as configured).
+- If the session is missing, you will be prompted for a login code and (if needed) 2FA password.
+- **Never run more than one instance at a time.**
 
-Logs are stored in the `logs` directory:
-- Console output for immediate feedback
-- Rotating file logs (10MB max, 5 backups)
-- Different log levels for different components
-
-## 🐛 Troubleshooting
-
-1. **Authentication Issues**
-   - Verify your Telegram API credentials
-   - Check if your phone number is correct
-   - Ensure you have a stable internet connection
-
-2. **Connection Problems**
-   - Verify the server is running
-   - Check if the port is available
-   - Ensure no firewall is blocking the connection
-
-3. **Rate Limiting**
-   - Default: 10 requests per minute
-   - Adjust `RATE_LIMIT` and `RATE_WINDOW` in `.env` if needed
+## 🛡️ Concurrency & Safety
+- All Telethon access is serialized with a global lock.
+- No concurrency, no web server, no "database is locked" errors.
+- Designed for robust, one-off CLI use and easy MCP integration.
 
 ## 🤝 Contributing
-
 1. Fork the repository
 2. Create a feature branch
 3. Commit your changes
@@ -120,129 +98,6 @@ Logs are stored in the `logs` directory:
 
 This project is licensed under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) License.
 
-You are free to:
-- **Share** — copy and redistribute the material in any medium or format
-- **Adapt** — remix, transform, and build upon the material for any purpose, even commercially.
-
-Under the following terms:
-- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
-
-See the full license text at: https://creativecommons.org/licenses/by-sa/4.0/
-
 ## ⚠️ Disclaimer
 
 This tool is part of the larger Sanctum toolset and is designed for use with Letta agents. Use responsibly and in accordance with Telegram's terms of service.
-
-## Project Structure
-```
-project_root/
-  ├── botfather_relay/           # FastAPI relay and Telethon client
-  ├── botfather.py               # Tool function and CLI
-  ├── tests/                     # All test scripts
-  ├── README.md                  # This file
-  ├── requirements.txt           # Python dependencies
-  ├── LICENSE                    # CC-BY-SA 4.0 License
-  └── ...
-```
-
-## Setup Instructions
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. **Configure the relay:**
-   - Set your Telegram API ID, hash, and phone number in the environment or `.env` file as described in `botfather_relay/config.py`.
-3. **Run the relay:**
-   ```bash
-   python -m botfather_relay.main
-   # or use screen/tmux as recommended
-   ```
-
-## Usage Guide
-### 1. Python Function
-```python
-from botfather import provision_botfather_message
-
-replies = provision_botfather_message("/newbot")
-for reply in replies:
-    print(reply)
-```
-
-### 2. CLI Tool
-```bash
-python botfather.py "/newbot"
-```
-
-#### CLI Output Example
-```
-BotFather reply 1
-BotFather reply 2
-BotFather reply 3
-```
-
-### 3. Expected Response Format
-The relay returns JSON like:
-```json
-{
-  "messages": [
-    "BotFather reply 1",
-    "BotFather reply 2",
-    "BotFather reply 3"
-  ]
-}
-```
-On error:
-```json
-{
-  "error": "Description of the error"
-}
-```
-
-## Integration Instructions (for Monday's Framework)
-Add this snippet to your integration docs:
-```python
-from botfather import provision_botfather_message
-
-try:
-    replies = provision_botfather_message("/setinline")
-    # Process replies as needed
-except Exception as e:
-    # Handle error (e.g., relay not running, network issue)
-    print(f"BotFather error: {e}")
-```
-
-## Running Tests
-To run all tests:
-```bash
-pytest
-```
-Or to run only the tool tests:
-```bash
-pytest tests/test_botfather.py -v
-```
-
-## Troubleshooting
-- **requests not installed:** Run `pip install requests`.
-- **Relay not running:** Start the relay server before using the tool or CLI.
-- **Connection refused:** Ensure the relay is listening on `localhost:57431`.
-- **API credentials invalid:** Double-check your Telegram API ID, hash, and phone number.
-- **Deprecation warnings:** Some warnings may appear due to upstream library changes; they do not affect core functionality.
-
-## ⚠️ Telethon Concurrency & Session Isolation
-
-**Important:** Telethon (the Telegram client library used by this relay) does not support running multiple clients for the same Telegram account on the same machine at the same time—even if they use different session files or scripts. Doing so can cause database locking errors, session corruption, or unpredictable behavior.
-
-**Best Practice:**
-- Only run one Telethon client per Telegram account per machine at a time.
-- If you need to run multiple services for the same account, isolate them by running the relay API in a separate Docker container or on a different machine.
-- For step-by-step Dockerization instructions, see: [`docs/part3-dockerizing-botfather-relay.md`](docs/part3-dockerizing-botfather-relay.md)
-
-This ensures reliable operation and avoids concurrency issues with Telethon session management.
-
-## License
-This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International License (CC-BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
-
-## Acknowledgments
-- Built for Monday (Sanctum agent) integration
-- Uses [Telethon](https://github.com/LonamiWebs/Telethon), [FastAPI](https://fastapi.tiangolo.com/), and [requests](https://docs.python-requests.org/)
