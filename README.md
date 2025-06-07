@@ -20,7 +20,7 @@ A robust, modular command-line tool for provisioning and managing Telegram bots 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/letta-botfather-tool.git
+   git clone https://github.com/actuallyrizzn/letta-botfather-tool.git
    cd letta-botfather-tool
    ```
 
@@ -48,16 +48,16 @@ A robust, modular command-line tool for provisioning and managing Telegram bots 
 
 ## 🚀 Usage
 
-All actions are performed via the CLI tool:
+All actions are performed via the CLI tool. **All commands implicitly target BotFather.**
 
 ### Send a message to BotFather
 ```bash
-python botfather_cli.py send-message --to BotFather --msg "/newbot"
+python botfather_cli.py send-message --msg "/newbot"
 ```
 
 ### Get replies from BotFather
 ```bash
-python botfather_cli.py get-replies --entity BotFather --limit 3
+python botfather_cli.py get-replies --limit 3
 ```
 
 - The tool will prompt for authentication if the session is missing or expired.
